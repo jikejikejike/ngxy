@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OameetingModelDao">
+    
+	<sql id="oameetingModelColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.meeting_desc AS "meetingDesc",
+		a.meeting_attendee AS "meetingAttendee",
+		a.meeting_start_date AS "meetingStartDate",
+		a.meeting_end_date AS "meetingEndDate",
+		a.meeting_room AS "meetingRoom",
+		a.meeting_type AS "meetingType",
+		a.meeting_manager AS "meetingManager",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.OAMEETING_ID as "ids"
+	</sql>
+	
+	<sql id="oameetingModelJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.meeting_attendee
+		LEFT JOIN sys_user u9 ON u9.id = a.meeting_manager
+		LEFT JOIN sys_user u10 ON u10.id = a.create_by
+		LEFT JOIN sys_user u12 ON u12.id = a.update_by
+	</sql>
+    
+	<select id="get" resultType="OameetingModel">
+		SELECT 
+			<include refid="oameetingModelColumns"/>
+		FROM oameeting_model a
+		<include refid="oameetingModelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OameetingModel">
+		SELECT 
+			<include refid="oameetingModelColumns"/>
+		FROM oameeting_model a
+		<include refid="oameetingModelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OameetingModel">
+		SELECT 
+			<include refid="oameetingModelColumns"/>
+		FROM oameeting_model a
+		<include refid="oameetingModelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oameeting_model(
+			id,
+			proc_ins_id,
+			meeting_desc,
+			meeting_attendee,
+			meeting_start_date,
+			meeting_end_date,
+			meeting_room,
+			meeting_type,
+			meeting_manager,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			OAMEETING_ID
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{meetingDesc},
+			#{meetingAttendee},
+			#{meetingStartDate},
+			#{meetingEndDate},
+			#{meetingRoom},
+			#{meetingType},
+			#{meetingManager},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{ids}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oameeting_model SET 	
+			proc_ins_id = #{procInsId},
+			meeting_desc = #{meetingDesc},
+			meeting_attendee = #{meetingAttendee},
+			meeting_start_date = #{meetingStartDate},
+			meeting_end_date = #{meetingEndDate},
+			meeting_room = #{meetingRoom},
+			meeting_type = #{meetingType},
+			meeting_manager = #{meetingManager},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE oameeting_model SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

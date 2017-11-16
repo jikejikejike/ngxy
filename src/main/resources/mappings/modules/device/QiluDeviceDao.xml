@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.device.dao.QiluDeviceDao">
+    
+	<sql id="qiluDeviceColumns">
+		a.id AS "id",
+		a.device_name AS "deviceName",
+		a.device_detail AS "deviceDetail",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate"
+	</sql>
+	
+	<sql id="qiluDeviceJoins">
+	</sql>
+    
+	<select id="get" resultType="QiluDevice">
+		SELECT 
+			<include refid="qiluDeviceColumns"/>
+		FROM qilu_device a
+		<include refid="qiluDeviceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="QiluDevice">
+		SELECT 
+			<include refid="qiluDeviceColumns"/>
+		FROM qilu_device a
+		<include refid="qiluDeviceJoins"/>
+		<where>
+			
+			<if test="deviceName != null and deviceName != ''">
+				AND a.device_name = #{deviceName}
+			</if>
+			<if test="deviceDetail != null and deviceDetail != ''">
+				AND a.device_detail = #{deviceDetail}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="QiluDevice">
+		SELECT 
+			<include refid="qiluDeviceColumns"/>
+		FROM qilu_device a
+		<include refid="qiluDeviceJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO qilu_device(
+			id,
+			device_name,
+			device_detail,
+			create_by,
+			create_date
+		) VALUES (
+			#{id},
+			#{deviceName},
+			#{deviceDetail},
+			#{createBy.id},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE qilu_device SET 	
+			device_name = #{deviceName},
+			device_detail = #{deviceDetail}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM qilu_device
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

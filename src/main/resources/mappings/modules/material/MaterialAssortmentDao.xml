@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.material.dao.MaterialAssortmentDao">
+    
+	<sql id="materialAssortmentColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.material_id AS "materialId"
+	</sql>
+	
+	<sql id="materialAssortmentJoins">
+	</sql>
+    
+	<select id="get" resultType="MaterialAssortment">
+		SELECT 
+			<include refid="materialAssortmentColumns"/>
+		FROM material_assortment a
+		<include refid="materialAssortmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MaterialAssortment">
+		SELECT 
+			<include refid="materialAssortmentColumns"/>
+		FROM material_assortment a
+		<include refid="materialAssortmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sort != null and sort != ''">
+				AND a.sort = #{sort}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updateBy != null and updateBy.id != null and updateBy.id != ''">
+				AND a.update_by = #{updateBy.id}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks = #{remarks}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MaterialAssortment">
+		SELECT 
+			<include refid="materialAssortmentColumns"/>
+		FROM material_assortment a
+		<include refid="materialAssortmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO material_assortment(
+			id,
+			name,
+			parent_id,
+			parent_ids,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			material_id
+		) VALUES (
+			#{id},
+			#{name},
+			#{parent.id},
+			#{parentIds},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{materialId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE material_assortment SET 	
+			name = #{name},
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			sort = #{sort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			material_id = #{materialId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE material_assortment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

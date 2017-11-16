@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.material.dao.MaterialDao">
+    
+	<sql id="materialColumns">
+		a.id AS "id",
+		a.material_Id as "materialId",
+		a.material_name AS "materialName",
+		a.material_model AS "materialModel",
+		a.material_unit AS "materialUnit",
+		a.material_number AS "materialNumber",
+		a.material_assortment_id AS "materialAssortment.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="materialJoins">
+	</sql>
+    
+	<select id="get" resultType="Material">
+		SELECT 
+			<include refid="materialColumns"/>
+		FROM material a
+		<include refid="materialJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Material">
+		SELECT 
+			<include refid="materialColumns"/>
+		FROM material a
+		<include refid="materialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id =  #{id}
+			</if>
+			<if test="materialName != null and materialName != ''">
+				AND a.material_name = #{materialName}
+			</if>
+			<if test="materialId != null and materialId != ''">
+				AND a.material_id = #{materialId}
+			</if>
+			<if test="materialModel != null and materialModel != ''">
+				AND a.material_model = #{materialModel}
+			</if>
+			<if test="materialUnit != null and materialUnit != ''">
+				AND a.material_unit = #{materialUnit}
+			</if>
+			<if test="materialNumber != null and materialNumber != ''">
+				AND a.material_number = #{materialNumber}
+			</if>
+			<if test="materialAssortment != null and materialAssortment.id != null and materialAssortment.id != ''">
+				AND a.material_assortment_id = #{materialAssortment.id}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updateBy != null and updateBy.id != null and updateBy.id != ''">
+				AND a.update_by = #{updateBy.id}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks = #{remarks}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Material">
+		SELECT 
+			<include refid="materialColumns"/>
+		FROM material a
+		<include refid="materialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+		<select id="findMaterialById" resultType="Material">
+		SELECT 
+				<include refid="materialColumns"/>
+		FROM material a
+		<include refid="materialJoins"/>
+		<where>
+			a.material_assortment_id = #{1}
+		</where>		
+	</select>
+	<insert id="insert">
+		INSERT INTO material(
+			id,
+			material_id,
+			material_name,
+			material_model,
+			material_unit,
+			material_number,
+			material_assortment_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+		    #{id},
+			#{materialId},
+			#{materialName},
+			#{materialModel},
+			#{materialUnit},
+			#{materialNumber},
+			#{materialAssortment.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE material SET 	
+			id = #{id},
+			material_Id = #{materialId},
+			material_name = #{materialName},
+			material_model = #{materialModel},
+			material_unit = #{materialUnit},
+			material_number = #{materialNumber},
+			material_assortment_id = #{materialAssortment.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE material SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

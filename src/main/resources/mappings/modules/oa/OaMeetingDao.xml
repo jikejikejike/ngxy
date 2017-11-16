@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OaMeetingDao">
+    
+	<sql id="oaMeetingColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.meeting_desc AS "meetingDesc",
+		a.meeting_attendee AS "meetingAttendee",
+		a.meeting_start_date AS "meetingStartDate",
+		a.meeting_end_date AS "meetingEndDate",
+		a.meeting_room AS "meetingRoom",
+		a.meeting_status AS "meetingStatus",
+		a.meeting_type AS "meetingType",
+		a.meeting_manager AS "meetingManager",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.files AS "files"
+	</sql>
+	
+	<sql id="oaMeetingJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.meeting_attendee
+		LEFT JOIN sys_user u10 ON u10.id = a.meeting_manager
+		LEFT JOIN sys_user u11 ON u11.id = a.create_by
+		LEFT JOIN sys_user u13 ON u13.id = a.update_by
+	</sql>
+    
+	<select id="get" resultType="OaMeeting">
+		SELECT 
+			<include refid="oaMeetingColumns"/>
+		FROM oa_meeting a
+		<include refid="oaMeetingJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OaMeeting">
+		SELECT 
+			<include refid="oaMeetingColumns"/>
+		FROM oa_meeting a
+		<include refid="oaMeetingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="meetingDesc != null and meetingDesc != ''">
+				AND a.meeting_desc LIKE 
+					<if test="dbName == 'oracle'">'%'||#{meetingDesc}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{meetingDesc}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{meetingDesc},'%')</if>
+			</if>
+			<if test="meetingAttendee != null and meetingAttendee != ''">
+				AND a.meeting_attendee = #{meetingAttendee}
+			</if>
+			<if test="meetingStartDate != null and meetingStartDate != ''">
+				AND a.meeting_start_date &gt;= #{meetingStartDate}
+			</if>
+			<if test="meetingEndDate != null and meetingEndDate != ''">
+				AND a.meeting_end_date &lt;= #{meetingEndDate}
+			</if>
+			<if test="meetingRoom != null and meetingRoom != ''">
+				AND a.meeting_room = #{meetingRoom}
+			</if>
+			<if test="meetingStatus != null and meetingStatus != ''">
+				AND a.meeting_status = #{meetingStatus}
+			</if>
+			<if test="meetingType != null and meetingType != ''">
+				AND a.meeting_type = #{meetingType}
+			</if>
+			<if test="meetingManager != null and meetingManager != ''">
+				AND a.meeting_manager = #{meetingManager}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updateBy != null and updateBy.id != null and updateBy.id != ''">
+				AND a.update_by = #{updateBy.id}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks = #{remarks}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OaMeeting">
+		SELECT 
+			<include refid="oaMeetingColumns"/>
+		FROM oa_meeting a
+		<include refid="oaMeetingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oa_meeting(
+			id,
+			name,
+			meeting_desc,
+			meeting_attendee,
+			meeting_start_date,
+			meeting_end_date,
+			meeting_room,
+			meeting_status,
+			meeting_type,
+			meeting_manager,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			files
+		) VALUES (
+			#{id},
+			#{name},
+			#{meetingDesc},
+			#{meetingAttendee},
+			#{meetingStartDate},
+			#{meetingEndDate},
+			#{meetingRoom},
+			#{meetingStatus},
+			#{meetingType},
+			#{meetingManager},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{files}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_meeting SET 	
+			name = #{name},
+			meeting_desc = #{meetingDesc},
+			meeting_attendee = #{meetingAttendee},
+			meeting_start_date = #{meetingStartDate},
+			meeting_end_date = #{meetingEndDate},
+			meeting_room = #{meetingRoom},
+			meeting_status = #{meetingStatus},
+			meeting_type = #{meetingType},
+			meeting_manager = #{meetingManager},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			files = #{files}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE oa_meeting SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
